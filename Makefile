@@ -4,7 +4,7 @@ PACKAGES = $(shell go list ./...)
 PACKAGES_PATH = $(shell go list -f '{{ .Dir }}' ./...)
 LATEST_DEPENDENCIES = $(shell go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all)
 
-APP_NAME=zero
+APP_NAME=form3
 VERSION := 0.0.1
 
 .PHONY: all
@@ -60,6 +60,3 @@ build:
 	go build -o ./$(APP_NAME) ./cmd
 
 setup: all build
-
-run:
-	@./zero
