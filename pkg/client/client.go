@@ -8,15 +8,21 @@ import (
 	"net/http"
 )
 
-var ErrNotFound = errors.New("resource not found")
-var ErrURLIsEmpty = errors.New("request does not have url")
-var ErrBodyIsEmpty = errors.New("request does not have body")
+var (
+	// ErrNotFound error
+	ErrNotFound = errors.New("resource not found")
+	// ErrURLIsEmpty error
+	ErrURLIsEmpty = errors.New("request does not have url")
+	// ErrBodyIsEmpty error
+	ErrBodyIsEmpty = errors.New("request does not have body")
+)
 
 type header struct {
 	Key   string
 	Value string
 }
 
+// Client handler different http methods
 type Client interface {
 	Delete(ctx context.Context, url string, body io.Reader) error
 	Get(ctx context.Context, url string) (resp *http.Response, err error)
@@ -28,6 +34,7 @@ type client struct {
 	httpClient *http.Client
 }
 
+// New create a new client
 func New() Client {
 	return &client{
 		httpClient: &http.Client{Transport: &http.Transport{}},
@@ -96,13 +103,13 @@ func (c *client) createHeader(ctx context.Context, method, url string, body io.R
 	return req, nil
 }
 
-func (c *client) do(req *http.Request) (*http.Response, error) {
-	resp, err := c.httpClient.Do(req)
+func (c *client) do(req *http.Request) (resp *http.Response, err error) {
+	resp, err = c.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed doing request [%s:%s]: %w", req.Method, req.URL.String(), err)
 	}
 
-	defer resp.Body.Close()
+	defer resp.Body.Close() // nolint:errcheck
 
 	switch resp.StatusCode {
 	case http.StatusOK, http.StatusCreated:

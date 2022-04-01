@@ -1,8 +1,6 @@
 package client
 
-// Account represents an account in the form3 org section.
-// See https://api-docs.form3.tech/api.html#organisation-accounts for
-// more information about fields.
+// AccountData represents an account in the form3 org section.
 type AccountData struct {
 	Attributes     *AccountAttributes `json:"attributes,omitempty"`
 	ID             string             `json:"id,omitempty"`
@@ -11,6 +9,7 @@ type AccountData struct {
 	Version        *int64             `json:"version,omitempty"`
 }
 
+// AccountAttributes represents an account in the form3 org section.
 type AccountAttributes struct {
 	AccountClassification   *string  `json:"account_classification,omitempty"`
 	AccountMatchingOptOut   *bool    `json:"account_matching_opt_out,omitempty"`
