@@ -4,9 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
-	"strings"
 	"testing"
 	"time"
 
@@ -112,7 +110,7 @@ func Test_client_Delete(t *testing.T) {
 					Transport: tt.mockTransport,
 				},
 			}
-			if err := c.Delete(context.Background(), tt.url, nil); (err != nil) != tt.wantErr {
+			if err := c.Delete(context.Background(), tt.url); (err != nil) != tt.wantErr {
 				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -205,7 +203,7 @@ func Test_client_Get(t *testing.T) {
 }
 
 func Test_client_Post(t *testing.T) {
-	body := strings.NewReader(`{
+	body := []byte(`{
 					"data": {
 						"id": "f14956e9-a751-4879-9751-eb47001649b4",
 						"version": 0,
@@ -217,8 +215,8 @@ func Test_client_Post(t *testing.T) {
 		runServer     bool
 		mockTransport *mockTransport
 		mockHandler   func(w http.ResponseWriter, r *http.Request)
-		header        []header
-		body          io.Reader
+		header        []Header
+		body          []byte
 		wantErr       bool
 	}{
 		{

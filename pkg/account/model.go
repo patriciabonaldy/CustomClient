@@ -1,4 +1,4 @@
-package client
+package account
 
 // AccountData represents an account in the form3 org section.
 type AccountData struct {
