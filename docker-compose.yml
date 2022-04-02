@@ -1,9 +1,10 @@
-version: '3'
+version: '3.8'
 
 services:
   accountapi:
     image: form3tech/interview-accountapi:v1.0.0-46-gb3b6c766
     restart: on-failure
+    container_name: accountapi
     depends_on:
       - postgresql
       - vault
@@ -23,6 +24,7 @@ services:
       - 8080:8080
   postgresql:
     image: postgres:9.5-alpine
+    container_name: postgresql
     healthcheck:
       test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
       timeout: 45s
@@ -37,6 +39,17 @@ services:
 
   vault:
     image: vault:1.6.3
+    container_name: vault
     environment:
       - SKIP_SETCAP=1
       - VAULT_DEV_ROOT_TOKEN_ID=8fb95528-57c6-422e-9722-d2147bcba8ed
+
+  accountclient:
+    image: form3:latest
+    container_name: accountclient
+    depends_on:
+      - accountapi
+      - postgresql
+      - vault
+    env_file:
+      - "./.env.dev"

@@ -8,7 +8,7 @@ APP_NAME=form3
 VERSION := 0.0.1
 
 .PHONY: all
-all: check_tools ensure-deps fmt imports linter test
+all: check_tools ensure-deps fmt imports linter
 
 .PHONY: check_tools
 check_tools:
@@ -55,8 +55,9 @@ coverage:
 .PHONY: test-cover
 test-cover: service-up coverage service-down
 
-build:
-	@echo "==> Building..."
-	go build -o ./$(APP_NAME) ./cmd
+build-docker:
+	@docker build --force-rm -t $(APP_NAME):$(VERSION) .
+	@docker tag $(APP_NAME):$(VERSION) $(APP_NAME):latest
 
-setup: all build
+setup: all build-docker
+	@docker-compose up -d
