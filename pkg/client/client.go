@@ -18,6 +18,7 @@ var (
 	ErrBodyIsEmpty = errors.New("request does not have body")
 )
 
+// Header represents Header in the request.
 type Header struct {
 	Key   string
 	Value string

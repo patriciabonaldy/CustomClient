@@ -1,16 +1,16 @@
-package account
+package accountClient
 
 // AccountData represents an account in the form3 org section.
 type AccountData struct {
-	Attributes     *AccountAttributes `json:"attributes,omitempty"`
-	ID             string             `json:"id,omitempty"`
-	OrganisationID string             `json:"organisation_id,omitempty"`
-	Type           string             `json:"type,omitempty"`
-	Version        *int64             `json:"version,omitempty"`
+	Attributes     *Attributes `json:"attributes,omitempty"`
+	ID             string      `json:"id,omitempty"`
+	OrganisationID string      `json:"organisation_id,omitempty"`
+	Type           string      `json:"type,omitempty"`
+	Version        *int64      `json:"version,omitempty"`
 }
 
-// AccountAttributes represents an account in the form3 org section.
-type AccountAttributes struct {
+// Attributes represents an account in the form3 org section.
+type Attributes struct {
 	AccountClassification   *string  `json:"account_classification,omitempty"`
 	AccountMatchingOptOut   *bool    `json:"account_matching_opt_out,omitempty"`
 	AccountNumber           string   `json:"account_number,omitempty"`
@@ -26,4 +26,9 @@ type AccountAttributes struct {
 	SecondaryIdentification string   `json:"secondary_identification,omitempty"`
 	Status                  *string  `json:"status,omitempty"`
 	Switched                *bool    `json:"switched,omitempty"`
+}
+
+// RequestAccount represents a request in the form3 org section.
+type RequestAccount struct {
+	Account AccountData `json:"data"`
 }
