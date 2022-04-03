@@ -9,14 +9,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/patriciabonaldy/interview-accountapi/pkg/client"
+	"github.com/patriciabonaldy/interview-accountapi/pkg/genericClient"
 )
 
 type mockClient struct {
 	wantError bool
 }
 
-func (m mockClient) Delete(_ context.Context, _ string, _ ...client.Header) error {
+func (m mockClient) Delete(_ context.Context, _ string, _ ...genericClient.Header) error {
 	if m.wantError {
 		return errors.New("unknown error")
 	}
@@ -56,7 +56,7 @@ func (m mockClient) Get(_ context.Context, _ string) (resp *http.Response, err e
 	}, nil
 }
 
-func (m mockClient) Post(_ context.Context, _ string, _ []byte, _ ...client.Header) (resp *http.Response, err error) {
+func (m mockClient) Post(_ context.Context, _ string, _ []byte, _ ...genericClient.Header) (resp *http.Response, err error) {
 	if m.wantError {
 		return nil, errors.New("unknown error")
 	}
@@ -97,13 +97,13 @@ func (m mockClient) Post(_ context.Context, _ string, _ []byte, _ ...client.Head
 	}, nil
 }
 
-var _ client.Client = &mockClient{}
+var _ genericClient.Client = &mockClient{}
 
 func Test_account_Save(t *testing.T) {
 	tests := []struct {
 		name        string
 		baseURL     string
-		client      client.Client
+		client      genericClient.Client
 		accountData AccountData
 		wantErr     bool
 	}{
@@ -265,7 +265,7 @@ func Test_account_GetByAccountID(t *testing.T) {
 	type args struct {
 		accountID string
 		baseURL   string
-		client    client.Client
+		client    genericClient.Client
 	}
 	tests := []struct {
 		name    string
@@ -343,7 +343,7 @@ func Test_account_GetByAccountID(t *testing.T) {
 
 func Test_account_Delete(t *testing.T) {
 	type args struct {
-		client    client.Client
+		client    genericClient.Client
 		baseURL   string
 		accountID string
 	}

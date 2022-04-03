@@ -1,4 +1,4 @@
-package client
+package genericClient
 
 import (
 	"context"

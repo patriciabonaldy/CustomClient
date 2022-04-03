@@ -11,7 +11,7 @@ import (
 
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
-	"github.com/patriciabonaldy/interview-accountapi/pkg/client"
+	"github.com/patriciabonaldy/interview-accountapi/pkg/genericClient"
 )
 
 var validBIC = regexp.MustCompile(`^([A-Z]{6}[A-Z0-9]{2}|[A-Z]{6}[A-Z0-9]{5})$`)
@@ -25,7 +25,7 @@ type Account interface {
 
 type account struct {
 	baseURL string
-	client  client.Client
+	client  genericClient.Client
 }
 
 // New function return an instance of account client
@@ -34,7 +34,7 @@ func New(baseURL string) (Account, error) {
 		return nil, errors.New("baseURL is empty")
 	}
 
-	return &account{baseURL: baseURL, client: client.New()}, nil
+	return &account{baseURL: baseURL, client: genericClient.New()}, nil
 }
 
 func (a *account) Delete(ctx context.Context, accountID string, version int) error {
@@ -88,7 +88,7 @@ func (a *account) Save(ctx context.Context, accountData AccountData) (RequestAcc
 		return RequestAccount{}, fmt.Errorf("failed saving account [%s]", err)
 	}
 
-	headers := []client.Header{{Key: "Content-Type", Value: "application/json"}}
+	headers := []genericClient.Header{{Key: "Content-Type", Value: "application/json"}}
 	resp, err := a.client.Post(ctx, a.baseURL, body, headers...)
 	if err != nil {
 		return RequestAccount{}, fmt.Errorf("failed saving account [%s]", err)
