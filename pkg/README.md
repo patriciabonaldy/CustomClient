@@ -29,14 +29,14 @@ The packages are kept separate to keep it as small and concise as possible.
 
 2.- create a new account client 
 
-~~~bash
+~~~go
 ac := New(baseURL string)
 ~~~
 
 Example:
 
  * creating a new account
-~~~bash
+~~~go
  accountData:=  AccountData{
               ID:             "b8fc26d7-ca23-4b32-a5ad-3a5e39b048be",
               OrganisationID: "b8fc26d7-ca23-4b32-a5ad-3a5e39b058be",
@@ -55,7 +55,7 @@ Example:
 
 * getting an account
 
-~~~bash
+~~~go
 resp = ac.GetByAccountID(context.Background(), "b8fc26d7-ca23-4b32-a5ad-3a5e39b048be")
 
 fmt.Println(resp)  
@@ -89,14 +89,14 @@ RequestAccount{
 
 * deleting an account
 
-~~~bash
+~~~go
 ac.Delete(context.Background(), "b8fc26d7-ca23-4b32-a5ad-3a5e39b048be", 0)
 ~~~
 ----------
 ### genericClient pkg
 
 
-it's a client library in Go to access any API, it's a suitable for use in
+it's a client library in Go to access any API, it's a suitable library for use in
 another software project, it has different methods available:
 ~~~bash
 * Delete(ctx context.Context, url string, headers ...Header) error
@@ -109,12 +109,12 @@ another software project, it has different methods available:
 
 2.- create a new client
 
-~~~bash
+~~~go
 client:= genericClient.New()
 ~~~
 
 You can add values to the header
-~~~bash
+~~~go
 // Header represents Header in the request.
 type Header struct {
   Key   string
@@ -123,7 +123,7 @@ type Header struct {
 ~~~
 
 * Post method
-~~~bash
+~~~go
 headers := []genericClient.Header{{Key: "Content-Type", Value: "application/json"}}
 resp, err :=client.Post(ctx, a.baseURL, body, headers...)
 ~~~
