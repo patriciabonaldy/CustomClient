@@ -59,5 +59,5 @@ build-docker:
 	@docker build --force-rm -t $(APP_NAME):$(VERSION) .
 	@docker tag $(APP_NAME):$(VERSION) $(APP_NAME):latest
 
-setup: all build-docker
-	@docker-compose up -d
+tests: all build-docker
+	@docker-compose up
