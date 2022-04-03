@@ -6,6 +6,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
@@ -26,6 +28,7 @@ func Test_Save(t *testing.T) {
 	tests := []struct {
 		name        string
 		accountData AccountData
+		fn          func(acc AccountData, callback func(ctx context.Context, id string, version int) error)
 		wantErr     bool
 	}{
 		{
@@ -43,6 +46,7 @@ func Test_Save(t *testing.T) {
 				},
 			},
 			wantErr: true,
+			fn:      func(acc AccountData, callback func(ctx context.Context, id string, version int) error) {},
 		},
 		{
 			name: "error in post",
@@ -59,6 +63,7 @@ func Test_Save(t *testing.T) {
 				},
 			},
 			wantErr: true,
+			fn:      func(acc AccountData, callback func(ctx context.Context, id string, version int) error) {},
 		},
 		{
 			name: "invalid BankID",
@@ -75,6 +80,7 @@ func Test_Save(t *testing.T) {
 				},
 			},
 			wantErr: true,
+			fn:      func(acc AccountData, callback func(ctx context.Context, id string, version int) error) {},
 		},
 		{
 			name: "invalid BIC",
@@ -91,6 +97,7 @@ func Test_Save(t *testing.T) {
 				},
 			},
 			wantErr: true,
+			fn:      func(acc AccountData, callback func(ctx context.Context, id string, version int) error) {},
 		},
 		{
 			name: "success",
@@ -106,6 +113,9 @@ func Test_Save(t *testing.T) {
 					BankIDCode: "GBDSC",
 				},
 			},
+			fn: func(acc AccountData, callback func(ctx context.Context, id string, version int) error) {
+				callback(context.Background(), acc.ID, 0) // nolint:errcheck
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -113,9 +123,18 @@ func Test_Save(t *testing.T) {
 			a, err := New(accounAddr)
 			require.NoError(t, err)
 
-			if _, err := a.Save(context.Background(), tt.accountData); (err != nil) != tt.wantErr {
+			ctx := context.Background()
+			resp, err := a.Save(ctx, tt.accountData)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Save() error = %v, wantErr %v", err, tt.wantErr)
 			}
+
+			got, err := a.GetByAccountID(ctx, tt.accountData.ID)
+			require.NoError(t, err)
+
+			assert.Equal(t, got, resp)
+
+			tt.fn(tt.accountData, a.Delete)
 		})
 	}
 }
