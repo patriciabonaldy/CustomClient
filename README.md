@@ -1,6 +1,6 @@
-# Form3PKG
+# CustomClient
 
-Form3 is a collection of clients used by access to different API, write in GO 
+CustomClient is a collection of clients used by access to different API, write in GO 
 
 The packages are kept separate to keep it as small and concise as possible.
 
