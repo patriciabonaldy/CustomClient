@@ -44,7 +44,7 @@ func New() Client {
 }
 
 func (c *client) Delete(ctx context.Context, url string, headers ...Header) error {
-	req, err := c.createHeader(ctx, http.MethodDelete, url, nil, headers)
+	req, err := c.withHeader(ctx, http.MethodDelete, url, nil, headers)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (c *client) Delete(ctx context.Context, url string, headers ...Header) erro
 }
 
 func (c *client) Get(ctx context.Context, url string) (resp *http.Response, err error) {
-	req, err := c.createHeader(ctx, http.MethodGet, url, nil, nil)
+	req, err := c.withHeader(ctx, http.MethodGet, url, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (c *client) Get(ctx context.Context, url string) (resp *http.Response, err 
 
 func (c *client) Post(ctx context.Context, url string, data []byte, headers ...Header) (resp *http.Response, err error) {
 	body := bytes.NewReader(data)
-	req, err := c.createHeader(ctx, http.MethodPost, url, body, headers)
+	req, err := c.withHeader(ctx, http.MethodPost, url, body, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (c *client) Post(ctx context.Context, url string, data []byte, headers ...H
 	return resp, nil
 }
 
-func (c *client) createHeader(ctx context.Context, method, url string, body io.Reader, headers []Header) (*http.Request, error) {
+func (c *client) withHeader(ctx context.Context, method, url string, body io.Reader, headers []Header) (*http.Request, error) {
 	if url == "" {
 		return nil, ErrURLIsEmpty
 	}
