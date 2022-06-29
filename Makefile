@@ -4,7 +4,7 @@ PACKAGES = $(shell go list ./...)
 PACKAGES_PATH = $(shell go list -f '{{ .Dir }}' ./...)
 LATEST_DEPENDENCIES = $(shell go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all)
 
-APP_NAME=form3
+APP_NAME=CustomClient
 VERSION := 0.0.1
 
 .PHONY: all
