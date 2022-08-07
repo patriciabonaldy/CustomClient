@@ -82,7 +82,7 @@ func Test_client_Delete(t *testing.T) {
 		},
 		{
 			name:      "success",
-			url:       "http://localhost:8080/anything/1",
+			url:       "http://localhost:8080/anything",
 			runServer: true,
 			mockTransport: &mockTransport{
 				resp: &http.Response{
@@ -104,11 +104,13 @@ func Test_client_Delete(t *testing.T) {
 				}(tt.mockHandler)
 			}
 
+			r := setupOptions(nil)
 			c := &client{
 				httpClient: &http.Client{
-					Timeout:   5 * time.Second,
-					Transport: tt.mockTransport,
+					Transport: &http.Transport{},
+					Timeout:   time.Duration(r.TimeDuration) + 5*time.Second,
 				},
+				retryRoundOptions: r,
 			}
 			if err := c.Delete(context.Background(), tt.url); (err != nil) != tt.wantErr {
 				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -160,7 +162,7 @@ func Test_client_Get(t *testing.T) {
 		},
 		{
 			name:      "success",
-			url:       "http://localhost:8080/anything/1",
+			url:       "http://localhost:8080/anything",
 			runServer: true,
 			mockTransport: &mockTransport{
 				resp: &http.Response{
@@ -189,11 +191,13 @@ func Test_client_Get(t *testing.T) {
 				}(tt.mockHandler)
 			}
 
+			r := setupOptions(nil)
 			c := &client{
 				httpClient: &http.Client{
-					Timeout:   5 * time.Second,
-					Transport: tt.mockTransport,
+					Transport: &http.Transport{},
+					Timeout:   time.Duration(r.TimeDuration) + 5*time.Second,
 				},
+				retryRoundOptions: r,
 			}
 			if _, err := c.Get(context.Background(), tt.url); (err != nil) != tt.wantErr {
 				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
@@ -218,6 +222,7 @@ func Test_client_Post(t *testing.T) {
 		header        []Header
 		body          []byte
 		wantErr       bool
+		wantRetry     bool
 	}{
 		{
 			name:    "URL is empty",
@@ -237,7 +242,7 @@ func Test_client_Post(t *testing.T) {
 		},
 		{
 			name:      "unknown error",
-			url:       "http://localhost:8080/anything/1",
+			url:       "http://localhost:8080/anything/1/6",
 			runServer: true,
 			mockTransport: &mockTransport{
 				resp: nil,
@@ -248,8 +253,8 @@ func Test_client_Post(t *testing.T) {
 			wantErr:     true,
 		},
 		{
-			name:      "error calls post",
-			url:       "http://localhost:8080/anything/1",
+			name:      "error calls post with retry",
+			url:       "http://localhost:8080/anything",
 			runServer: true,
 			mockTransport: &mockTransport{
 				resp: &http.Response{
@@ -261,12 +266,12 @@ func Test_client_Post(t *testing.T) {
 			mockHandler: func(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, fmt.Sprint(errors.New("unknown error")), http.StatusInternalServerError)
 			},
-			body:    body,
-			wantErr: true,
+			body:      body,
+			wantRetry: true,
 		},
 		{
 			name:      "success",
-			url:       "http://localhost:8080/anything/1",
+			url:       "http://localhost:8080/anything",
 			runServer: true,
 			mockTransport: &mockTransport{
 				resp: &http.Response{
@@ -285,16 +290,24 @@ func Test_client_Post(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.runServer {
 				go func(handler func(w http.ResponseWriter, r *http.Request)) {
-					newServerTest("/anything", handler)
+					newServerTest("/anything/1", handler)
 				}(tt.mockHandler)
+			}
+
+			r := setupOptions(nil)
+			if tt.wantRetry {
+				r.ShouldRetry = true
+				r.MaxRetryCount = 2
 			}
 
 			c := &client{
 				httpClient: &http.Client{
-					Timeout:   5 * time.Second,
-					Transport: tt.mockTransport,
+					Transport: &http.Transport{},
+					Timeout:   time.Duration(r.TimeDuration) + 5*time.Second,
 				},
+				retryRoundOptions: r,
 			}
+
 			if _, err := c.Post(context.Background(), tt.url, tt.body, tt.header...); (err != nil) != tt.wantErr {
 				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
 			}
