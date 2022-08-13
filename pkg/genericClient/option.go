@@ -1,6 +1,7 @@
 package genericClient
 
 import (
+	"math"
 	"time"
 )
 
@@ -8,7 +9,7 @@ type Options struct {
 	TimeDuration     int
 	MaxRetryCount    int
 	ShouldRetry      bool
-	CalculateBackoff time.Duration
+	CalculateBackoff func(attemptCount int) time.Duration
 }
 
 type Option func(*Options)
@@ -37,8 +38,14 @@ func WithRetryPolicy(retryPolicy bool) Option {
 	}
 }
 
-func WithBackoffPolicy(backoffPolicy time.Duration) Option {
-	return func(roundtripper *Options) {
-		roundtripper.CalculateBackoff = backoffPolicy
+func WithBackoffPolicy() Option {
+	min := 1
+	return func(r *Options) {
+		r.CalculateBackoff = func(attemptCount int) time.Duration {
+			nextWait := time.Duration(math.Pow(2, float64(min)))
+			min++
+
+			return nextWait
+		}
 	}
 }

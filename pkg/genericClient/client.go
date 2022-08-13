@@ -40,7 +40,7 @@ type client struct {
 
 // New create a new client
 func New(options ...Option) Client {
-	r := setupOptions(options)
+	r := setupOptions(options...)
 	return &client{
 		httpClient: &http.Client{
 			Transport: &http.Transport{},
@@ -50,10 +50,9 @@ func New(options ...Option) Client {
 	}
 }
 
-func setupOptions(options []Option) *Options {
+func setupOptions(options ...Option) *Options {
 	r := &Options{
-		TimeDuration:     10,
-		CalculateBackoff: 3,
+		TimeDuration: 10,
 	}
 	for _, fn := range options {
 		fn(r)
@@ -151,9 +150,9 @@ func (c *client) do(req *Request) (resp *http.Response, err error) {
 			break
 		}
 
-		c.retryRoundOptions.MaxRetryCount--
 		resetBody(req)
-		<-time.After(c.retryRoundOptions.CalculateBackoff * time.Second)
+		c.retryRoundOptions.MaxRetryCount--
+		<-time.After(c.retryRoundOptions.CalculateBackoff(c.retryRoundOptions.MaxRetryCount))
 	}
 
 	switch resp.StatusCode {
