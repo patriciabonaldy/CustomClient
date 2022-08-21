@@ -4,7 +4,7 @@ PACKAGES = $(shell go list ./...)
 PACKAGES_PATH = $(shell go list -f '{{ .Dir }}' ./...)
 LATEST_DEPENDENCIES = $(shell go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all)
 
-APP_NAME=CustomClient
+APP_NAME=customclient
 VERSION := 0.0.1
 
 .PHONY: all
@@ -51,13 +51,3 @@ coverage:
 	@echo "=> Running tests and generating report"
 	@go test ./... -covermode=atomic -coverprofile=/tmp/coverage.out -coverpkg=./... -count=1
 	@go tool cover -html=/tmp/coverage.out
-
-.PHONY: test-cover
-test-cover: service-up coverage service-down
-
-build-docker:
-	@docker build --force-rm -t $(APP_NAME):$(VERSION) .
-	@docker tag $(APP_NAME):$(VERSION) $(APP_NAME):latest
-
-tests: all build-docker
-	@docker-compose up
